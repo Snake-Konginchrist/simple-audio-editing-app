@@ -65,3 +65,8 @@ python main.py
 ## 版权和许可
 
 本项目在 MIT 许可下发布。详情请见 [LICENSE](LICENSE) 文件。
+
+## 联系方式
+- GitHub: [Snake-Konginchrist](https://github.com/Snake-Konginchrist)
+- Gitee: [Snake-Konginchrist](https://gitee.com/Snake-Konginchrist)
+- Email: developer@skstudio.cn（优先）
