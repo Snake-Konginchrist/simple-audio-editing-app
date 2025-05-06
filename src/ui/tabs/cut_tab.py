@@ -46,8 +46,14 @@ class CutTab(BaseTab):
         button_frame = ttk.Frame(cut_frame)
         button_frame.pack(fill=tk.X, pady=10)
         
+        preview_cut_button = ttk.Button(button_frame, text="预览剪切", command=self.preview_cut)
+        preview_cut_button.pack(side=tk.LEFT, padx=5)
+        
         cut_button = ttk.Button(button_frame, text="剪切选定部分", command=self.cut_audio)
         cut_button.pack(side=tk.LEFT, padx=5)
+        
+        preview_remove_button = ttk.Button(button_frame, text="预览删除", command=self.preview_remove)
+        preview_remove_button.pack(side=tk.LEFT, padx=5)
         
         remove_button = ttk.Button(button_frame, text="删除选定部分", command=self.remove_segment)
         remove_button.pack(side=tk.LEFT, padx=5)
@@ -71,13 +77,16 @@ class CutTab(BaseTab):
         # 默认设置结束时间为音频总时长
         self.end_time_var.set(format_time(duration))
     
-    def cut_audio(self):
+    def validate_time_range(self):
         """
-        剪切音频
+        验证时间范围
+        
+        返回:
+            成功时返回(start_ms, end_ms)元组，失败返回None
         """
         if not self.app.current_audio_path:
             show_error("错误", "请先加载音频文件")
-            return
+            return None
         
         try:
             start_ms = parse_time(self.start_time_var.get())
@@ -85,8 +94,65 @@ class CutTab(BaseTab):
             
             if start_ms >= end_ms:
                 show_error("错误", "开始时间必须小于结束时间")
-                return
+                return None
+            
+            return start_ms, end_ms
                 
+        except Exception as e:
+            show_error("错误", f"时间格式错误: {str(e)}")
+            return None
+    
+    def preview_cut(self):
+        """
+        预览剪切效果
+        """
+        time_range = self.validate_time_range()
+        if not time_range:
+            return
+            
+        start_ms, end_ms = time_range
+        
+        try:
+            # 使用统一的预览接口
+            AudioProcessor.preview_operation(
+                self.app.current_audio_path,
+                AudioProcessor.cut_audio,
+                start_ms, end_ms
+            )
+        except Exception as e:
+            show_error("错误", f"预览剪切音频失败: {str(e)}")
+    
+    def preview_remove(self):
+        """
+        预览删除效果
+        """
+        time_range = self.validate_time_range()
+        if not time_range:
+            return
+            
+        start_ms, end_ms = time_range
+        
+        try:
+            # 使用统一的预览接口
+            AudioProcessor.preview_operation(
+                self.app.current_audio_path,
+                AudioProcessor.remove_segment,
+                start_ms, end_ms
+            )
+        except Exception as e:
+            show_error("错误", f"预览删除效果失败: {str(e)}")
+    
+    def cut_audio(self):
+        """
+        剪切音频
+        """
+        time_range = self.validate_time_range()
+        if not time_range:
+            return
+            
+        start_ms, end_ms = time_range
+        
+        try:
             output_path = save_audio_file()
             if not output_path:
                 return
@@ -101,18 +167,13 @@ class CutTab(BaseTab):
         """
         删除音频片段
         """
-        if not self.app.current_audio_path:
-            show_error("错误", "请先加载音频文件")
+        time_range = self.validate_time_range()
+        if not time_range:
             return
+            
+        start_ms, end_ms = time_range
         
         try:
-            start_ms = parse_time(self.start_time_var.get())
-            end_ms = parse_time(self.end_time_var.get())
-            
-            if start_ms >= end_ms:
-                show_error("错误", "开始时间必须小于结束时间")
-                return
-                
             output_path = save_audio_file()
             if not output_path:
                 return

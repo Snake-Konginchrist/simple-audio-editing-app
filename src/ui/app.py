@@ -26,8 +26,8 @@ class AudioEditorApp:
         """
         self.root = root
         self.root.title("简易音频编辑器")
-        self.root.geometry("900x650")
-        self.root.minsize(800, 600)
+        self.root.geometry("1200x800")
+        self.root.minsize(1000, 700)
         
         # 存储当前加载的音频文件路径
         self.current_audio_path = None
