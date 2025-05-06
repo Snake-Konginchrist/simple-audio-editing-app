@@ -1,22 +1,37 @@
-# Audio-Video Reverse App
+# 简易音频编辑器
 
-这是一个简单的桌面应用程序，用于倒放音频和视频文件。应用提供了一个图形用户界面，允许用户上传文件，选择保存的位置，并执行倒放操作。支持的文件格式包括 MP3、WAV、MP4 和 AVI。
+这是一个简单的桌面应用程序，用于编辑音频文件。应用提供了一个图形用户界面，允许用户执行各种基本的音频编辑操作，如剪切、合并、添加特效等。支持的文件格式包括 MP3、WAV、AAC、OGG、FLAC等。
+
+## 功能特性
+
+- **基本信息查看**：显示音频文件的路径、格式和时长信息
+- **剪切和删除**：可以剪取音频的指定部分或删除某一时间段
+- **合并音频**：支持多个音频文件的合并，可以调整合并顺序
+- **音频效果**：
+  - 倒放：将音频从后向前播放
+  - 调整音量：增大或减小音频的音量
+  - 改变速度：加快或减慢音频播放速度（不改变音调）
+  - 淡入/淡出：添加渐入或渐出效果
 
 ## 开始使用
 
-要运行这个程序，你需要在你的系统上安装 Python 和一些依赖库，包括 FFmpeg，用于处理音视频文件。
+要运行这个程序，你需要在你的系统上安装 Python 和一些依赖库，包括 FFmpeg，用于处理音频文件。
 
 ### 先决条件
 
-确保你已安装 Python 和 pip。此外，你还需要安装以下库：
+确保你已安装 Python 3.6+ 和 pip。此外，你还需要安装以下库：
 
 ```bash
-pip install moviepy pydub tkinter
+pip install -r requirements.txt
 ```
+
+这将安装以下依赖：
+- pydub：用于音频处理
+- ffmpeg-python：用于与 FFmpeg 交互
 
 ### 安装 FFmpeg
 
-FFmpeg 是一个必须的组件，用于处理音频和视频文件。按照以下步骤安装和配置 FFmpeg：
+FFmpeg 是一个必须的组件，用于处理音频文件。按照以下步骤安装和配置 FFmpeg：
 
 1. **下载 FFmpeg**：
    - 访问 [FFmpeg官方下载页面](https://ffmpeg.org/download.html)。
@@ -26,7 +41,7 @@ FFmpeg 是一个必须的组件，用于处理音频和视频文件。按照以�
    - 解压下载的文件到一个你喜欢的目录，例如 `C:\FFmpeg`。
 
 3. **设置环境变量**：
-   - 在 Windows 上，搜索并打开“系统环境变量”编辑器。
+   - 在 Windows 上，搜索并打开"系统环境变量"编辑器。
    - 编辑 `Path` 环境变量，添加 FFmpeg 的 bin 目录到该变量中，例如 `C:\FFmpeg\bin`。
    - 保存更改并重新启动你的开发环境或计算机。
 
@@ -38,8 +53,8 @@ FFmpeg 是一个必须的组件，用于处理音频和视频文件。按照以�
 1. 克隆仓库到本地机器：
 
 ```bash
-git clone https://gitee.com/Snake-Konginchrist/audio-video-reverse-app.git
-cd audio-video-reverse-app
+git clone https://gitee.com/Snake-Konginchrist/simple-audio-editing-app.git
+cd simple-audio-editing-app
 ```
 
 2. 运行程序：
@@ -48,15 +63,39 @@ cd audio-video-reverse-app
 python main.py
 ```
 
-## 功能
+## 使用指南
 
-- **上传音视频文件**：选择你想要倒放的音频或视频文件。
-- **倒放处理**：程序将处理文件并将倒放后的结果保存到你选择的位置。
-- **支持格式**：MP3, WAV, MP4, AVI。
+1. **加载音频文件**：
+   - 打开程序后，点击"加载音频文件"按钮选择一个音频文件。
+   - 文件信息将显示在基本信息标签页中。
 
-## 构建
+2. **剪切或删除音频片段**：
+   - 切换到"剪切/删除"标签页。
+   - 输入开始时间和结束时间（格式：分:秒.毫秒，如 01:23.45）。
+   - 点击"剪切选定部分"保留该部分，或点击"删除选定部分"删除该部分。
 
-本项目使用 Python 的 Tkinter 库构建 GUI，使用 moviepy 和 pydub 进行音视频处理。
+3. **合并多个音频文件**：
+   - 切换到"合并音频"标签页。
+   - 点击"添加音频文件"选择多个音频文件。
+   - 使用"上移"、"下移"和"移除所选"按钮调整文件顺序。
+   - 点击"合并选定文件"将文件合并为一个新文件。
+
+4. **添加音频效果**：
+   - 切换到"音频效果"标签页。
+   - 选择想要的效果并应用：
+     - 倒放：点击"倒放音频"按钮。
+     - 调整音量：使用滑块设置音量变化值(dB)，点击"应用"。
+     - 改变速度：使用滑块设置速度因子，点击"应用"。
+     - 淡入/淡出：设置时长并点击对应按钮。
+
+## 技术实现
+
+本项目使用 Python 的 Tkinter 库构建 GUI，使用 pydub 进行音频处理。代码结构清晰，采用模块化设计：
+
+- **main.py**：程序入口
+- **ui.py**：用户界面模块
+- **processors.py**：音频处理功能模块
+- **utils.py**：工具函数模块
 
 ## 贡献
 
@@ -67,6 +106,7 @@ python main.py
 本项目在 MIT 许可下发布。详情请见 [LICENSE](LICENSE) 文件。
 
 ## 联系方式
+
 - GitHub: [Snake-Konginchrist](https://github.com/Snake-Konginchrist)
 - Gitee: [Snake-Konginchrist](https://gitee.com/Snake-Konginchrist)
 - Email: developer@skstudio.cn（优先）
