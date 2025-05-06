@@ -1,0 +1,86 @@
+# Python字节码文件
+__pycache__/
+*.py[cod]
+*$py.class
+
+# 虚拟环境
+venv/
+env/
+ENV/
+.env
+.venv
+env.bak/
+venv.bak/
+
+# 分发/打包
+*.egg-info/
+.installed.cfg
+*.egg
+dist/
+build/
+eggs/
+parts/
+bin/
+var/
+sdist/
+develop-eggs/
+.installed.cfg
+lib/
+lib64/
+*.so
+*.dylib
+.Python
+MANIFEST
+
+# IDE相关文件
+.idea/
+.vscode/
+*.swp
+.project
+.pydevproject
+.spyderproject
+.spyproject
+.ropeproject
+*.sublime-workspace
+*.sublime-project
+
+# 系统文件
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# 测试和覆盖率报告
+.coverage
+htmlcov/
+.tox/
+.nox/
+.hypothesis/
+.pytest_cache/
+cover/
+.coverage.*
+*.cover
+nosetests.xml
+coverage.xml
+
+# 日志和临时文件
+*.log
+log/
+logs/
+tmp/
+temp/
+
+# 本地配置文件
+local_settings.py
+*.local
+instance/
+
+# 输出音频文件（避免将测试生成的音频文件提交到版本控制）
+*.mp3
+*.wav
+*.aac
+*.ogg
+*.flac
+*.m4a
+# 如果想要包含示例音频文件，可以使用!，例如：
+# !example_files/*.mp3 
