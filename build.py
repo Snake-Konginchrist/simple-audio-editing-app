@@ -68,11 +68,35 @@ def check_dependencies():
     required_packages = ["pyinstaller"]
     missing_packages = []
     
-    for package in required_packages:
-        try:
-            __import__(package)
-        except ImportError:
-            missing_packages.append(package)
+    # 使用pip list命令检查已安装的包
+    try:
+        pip_list = subprocess.run(
+            [sys.executable, "-m", "pip", "list"], 
+            stdout=subprocess.PIPE,
+            text=True,
+            check=True
+        ).stdout.lower()
+        
+        for package in required_packages:
+            # 检查包名是否在pip list输出中
+            if package.lower() not in pip_list and package.lower().replace('-', '_') not in pip_list:
+                missing_packages.append(package)
+    except subprocess.CalledProcessError:
+        print("警告: 无法获取已安装包列表，将尝试导入测试")
+        # 如果pip list命令失败，回退到导入测试
+        for package in required_packages:
+            try:
+                # 尝试不同的大小写形式
+                try:
+                    __import__(package)
+                except ImportError:
+                    # 尝试首字母大写版本
+                    try:
+                        __import__(package.capitalize())
+                    except ImportError:
+                        missing_packages.append(package)
+            except ImportError:
+                missing_packages.append(package)
     
     if missing_packages:
         print("\n缺少以下必要的依赖包：")
@@ -164,6 +188,10 @@ def build_app(one_file=True, console=False, with_ffmpeg=False):
         cmd.append("--onefile")
     else:
         cmd.append("--onedir")
+        # 在文件夹模式下，需要将图标文件作为数据文件包含进去
+        if os.path.exists(ICON_FILE):
+            separator = ";" if system == "Windows" else ":"
+            cmd.append(f"--add-data={ICON_FILE}{separator}.")
     
     # 是否显示控制台
     if not console:
@@ -174,6 +202,16 @@ def build_app(one_file=True, console=False, with_ffmpeg=False):
     
     # 添加需要包含的文件和目录
     data_includes = []
+    
+    # 包含本地化翻译文件
+    locales_dir = os.path.join("src", "locales")
+    if os.path.exists(locales_dir) and os.path.isdir(locales_dir):
+        separator = ";" if system == "Windows" else ":"
+        # 无论是单文件还是目录模式，都保持相同的目标路径
+        # 这样language.py的处理逻辑可以保持一致
+        target_path = os.path.join("src", "locales")
+        cmd.append(f"--add-data={locales_dir}{separator}{target_path}")
+        print(f"✅ 已添加本地化文件: {locales_dir} -> {target_path}")
     
     # 如果选择打包FFmpeg
     if with_ffmpeg:

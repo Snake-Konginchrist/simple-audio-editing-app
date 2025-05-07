@@ -20,6 +20,10 @@ A desktop application for basic audio editing. The app provides a graphical user
     - Custom bitrate settings
   - Support for various video formats (MP4, AVI, MOV, MKV, etc.)
   - Support for multiple audio output formats (MP3, WAV, AAC, OGG, FLAC, M4A)
+- **Multilingual Support**:
+  - Built-in Chinese and English interfaces
+  - Language can be switched from the File menu
+  - Complete translations for all UI elements and messages
 
 ## Getting Started
 
@@ -154,6 +158,11 @@ The build script offers the following options:
 
 After building, the executable will be generated in the `dist` directory.
 
+### Packaging Mode Features
+
+- **Single-file Mode**: Packages all dependencies and resources into a single executable file, convenient for distribution but larger in size.
+- **Folder Mode**: Generates a folder containing multiple files, smaller in size but requires maintaining the file structure for distribution. Folder mode also generates log files (located in the logs directory) for debugging and troubleshooting.
+
 ## Usage Guide
 
 1. **Load Audio File**:
@@ -189,6 +198,12 @@ After building, the executable will be generated in the `dist` directory.
      - **Custom Bitrate**: Manually set the output audio bitrate
    - Click the "Extract Audio" button, then select a save location.
    - Wait for the extraction to complete; a success message will be displayed upon completion.
+
+6. **Switch Language**:
+   - Click the "File" menu.
+   - Select "Language" from the dropdown menu.
+   - Choose your preferred language (简体中文 or English) from the submenu.
+   - The program will ask if you want to restart the application immediately to apply the new language setting.
 
 ### Video Audio Extraction Notes
 
@@ -227,9 +242,14 @@ simple-audio-editing-app/
 │   │   ├── main_window.py      # Main window class
 │   │   ├── audio_player.py     # Audio player component
 │   │   └── ...
+│   ├── locales/            # Multilingual support
+│   │   ├── zh_CN.json          # Simplified Chinese translation
+│   │   ├── en_US.json          # English translation
+│   │   └── ...
 │   └── utils/              # Utility functions module
 │       ├── time_formatter.py   # Time format conversion tool
 │       ├── file_utils.py       # File operation tools
+│       ├── language.py         # Language support utility
 │       └── ...
 ├── build/                  # Build temporary files (auto-generated)
 └── dist/                   # Packaged executables (auto-generated)
@@ -242,6 +262,7 @@ This project uses Python's Tkinter library to build the GUI, pydub for audio pro
 - **core**: Responsible for core audio processing functions such as cutting, merging, adding effects, etc.
 - **ui**: Responsible for implementing the user interface, including the main window and the interfaces for various functional modules
 - **utils**: Provides various auxiliary functions, such as time format conversion, file operations, etc.
+- **locales**: Provides multilingual support, containing translation files for different languages
 
 ## Contributing
 
