@@ -32,6 +32,11 @@ lib64/
 .Python
 MANIFEST
 
+# PyInstaller相关
+*.spec
+*.manifest
+*.toc
+
 # IDE相关文件
 .idea/
 .vscode/
@@ -83,4 +88,29 @@ instance/
 *.flac
 *.m4a
 # 如果想要包含示例音频文件，可以使用!，例如：
-# !example_files/*.mp3 
+# !example_files/*.mp3
+
+# 视频文件
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.flv
+*.wmv
+*.webm
+
+# 构建工具生成的临时文件
+_pyi_*
+_MEI*
+*.zip
+
+# 如果使用自动生成的图标，也可以考虑忽略它
+# icon.ico
+# 如果图标是项目的一部分并且希望包含在版本控制中，请注释上一行
+
+# 特定于项目的忽略配置
+# ここに特定のプロジェクトファイルを追加
+
+# FFmpeg和其他外部工具可能下载的文件
+tools/
+external/ 

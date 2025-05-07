@@ -1,0 +1,8 @@
+{
+    "name": "简易音频编辑器",
+    "version": "1.0.0",
+    "author": "Snake Konginchrist",
+    "description": "一个简单的音频编辑桌面应用",
+    "main_script": "main.py",
+    "icon_file": "icon.ico"
+} 

@@ -1,5 +1,8 @@
 from pydub import AudioSegment
 import os
+import subprocess
+import tempfile
+import json
 
 class AudioProcessor:
     """
@@ -382,4 +385,212 @@ class AudioProcessor:
         # 合并三段
         result_audio = first_part + silence + second_part
         
-        AudioProcessor.save_audio(result_audio, output_path) 
+        AudioProcessor.save_audio(result_audio, output_path)
+    
+    @staticmethod
+    def get_video_audio_info(video_path):
+        """
+        获取视频文件中音频流的信息
+        
+        参数:
+            video_path: 视频文件路径
+            
+        返回:
+            字典，包含音频比特率、编码器、采样率等信息
+        """
+        try:
+            # 构建FFmpeg命令
+            cmd = [
+                "ffprobe",
+                "-v", "quiet",
+                "-print_format", "json",
+                "-show_streams",
+                "-select_streams", "a:0",  # 选择第一个音频流
+                video_path
+            ]
+            
+            # 执行命令并获取输出
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            
+            # 解析JSON输出
+            data = json.loads(result.stdout)
+            
+            # 检查是否有音频流
+            if 'streams' in data and len(data['streams']) > 0:
+                stream = data['streams'][0]
+                
+                # 提取信息
+                info = {
+                    'codec_name': stream.get('codec_name', 'unknown'),
+                    'bit_rate': stream.get('bit_rate', 'unknown'),
+                    'sample_rate': stream.get('sample_rate', 'unknown'),
+                    'channels': stream.get('channels', 'unknown')
+                }
+                
+                return info
+            
+            return {'codec_name': 'unknown', 'bit_rate': 'unknown', 'sample_rate': '44100', 'channels': '2'}
+            
+        except Exception as e:
+            print(f"获取视频音频信息时出错: {str(e)}")
+            return {'codec_name': 'unknown', 'bit_rate': 'unknown', 'sample_rate': '44100', 'channels': '2'}
+        
+    @staticmethod
+    def extract_audio_from_video(video_path, output_path, audio_format="mp3", audio_bitrate="192k"):
+        """
+        从视频文件中提取音频
+        
+        参数:
+            video_path: 视频文件路径
+            output_path: 输出音频文件路径
+            audio_format: 输出音频格式 (默认: mp3)
+            audio_bitrate: 音频比特率 (默认: 192k，如果为"original"则保留原始比特率，
+                          如果为"original_quality"则尝试保留原始音频质量)
+            
+        返回:
+            bool: 操作是否成功
+        """
+        try:
+            # 检查输出目录是否存在，不存在则创建
+            output_dir = os.path.dirname(output_path)
+            if output_dir and not os.path.exists(output_dir):
+                os.makedirs(output_dir)
+            
+            # 获取原始视频的音频信息
+            audio_info = AudioProcessor.get_video_audio_info(video_path)
+            original_codec = audio_info.get('codec_name', 'unknown')
+            original_bitrate = audio_info.get('bit_rate', 'unknown')
+            original_sample_rate = audio_info.get('sample_rate', '44100')
+            
+            # 构建FFmpeg命令
+            cmd = [
+                "ffmpeg",
+                "-i", video_path,
+                "-vn",  # 不处理视频流
+            ]
+            
+            # 如果使用原始比特率，且输出格式与原始格式兼容
+            if audio_bitrate == "original" and AudioProcessor._is_format_compatible(original_codec, audio_format):
+                # 音频流复制模式，不进行重新编码
+                cmd.extend([
+                    "-acodec", "copy"
+                ])
+            else:
+                # 指定编码器
+                cmd.extend([
+                    "-acodec", AudioProcessor._get_codec_for_format(audio_format),
+                ])
+                
+                # 处理比特率设置
+                if audio_bitrate == "original_quality" and original_bitrate != "unknown":
+                    # 尝试保留原始音频质量
+                    try:
+                        # 获取原始比特率（数字部分）
+                        original_br_value = int(original_bitrate)
+                        # 对于MP3格式，限制最大比特率为320k
+                        if audio_format == "mp3" and original_br_value > 320000:
+                            cmd.extend(["-ab", "320k"])
+                        else:
+                            # 使用原始比特率
+                            cmd.extend(["-ab", f"{original_br_value // 1000}k"])
+                    except:
+                        # 如果转换失败，使用高质量默认值
+                        cmd.extend(["-ab", "320k"])
+                elif audio_bitrate != "original":
+                    # 使用指定的比特率
+                    cmd.extend(["-ab", audio_bitrate])
+                
+                # 使用原始采样率
+                if original_sample_rate != "unknown":
+                    cmd.extend(["-ar", original_sample_rate])
+                else:
+                    cmd.extend(["-ar", "44100"])  # 默认采样率
+            
+            # 添加输出文件
+            cmd.extend([
+                "-y",  # 覆盖输出文件
+                output_path
+            ])
+            
+            # 执行命令
+            subprocess.run(cmd, check=True, capture_output=True)
+            return True
+        except subprocess.CalledProcessError as e:
+            print(f"FFmpeg错误: {e.stderr.decode('utf-8', errors='ignore')}")
+            return False
+        except Exception as e:
+            print(f"提取音频时出错: {str(e)}")
+            return False
+    
+    @staticmethod
+    def _get_codec_for_format(audio_format):
+        """
+        根据音频格式获取对应的编解码器
+        
+        参数:
+            audio_format: 音频格式
+            
+        返回:
+            编解码器名称
+        """
+        codecs = {
+            "mp3": "libmp3lame",
+            "aac": "aac",
+            "wav": "pcm_s16le",
+            "ogg": "libvorbis",
+            "flac": "flac",
+            "m4a": "aac"
+        }
+        return codecs.get(audio_format.lower(), "copy")
+        
+    @staticmethod
+    def extract_audio_with_pydub(video_path, output_path):
+        """
+        使用pydub从视频中提取音频(备用方法)
+        
+        参数:
+            video_path: 视频文件路径
+            output_path: 输出音频文件路径
+            
+        返回:
+            bool: 操作是否成功
+        """
+        try:
+            # 使用pydub从视频中提取音频
+            audio = AudioSegment.from_file(video_path)
+            
+            # 获取输出格式
+            ext = os.path.splitext(output_path)[1].lower().strip('.')
+            
+            # 导出音频
+            audio.export(output_path, format=ext)
+            return True
+        except Exception as e:
+            print(f"使用pydub提取音频时出错: {str(e)}")
+            # 如果pydub失败，尝试使用ffmpeg
+            return AudioProcessor.extract_audio_from_video(video_path, output_path)
+
+    @staticmethod
+    def _is_format_compatible(original_codec, target_format):
+        """
+        检查原始编解码器是否与目标格式兼容（可以直接复制）
+        
+        参数:
+            original_codec: 原始编解码器
+            target_format: 目标格式
+            
+        返回:
+            bool: 是否兼容
+        """
+        # 定义格式与编解码器的兼容映射
+        compatible_formats = {
+            'mp3': ['mp3', 'libmp3lame'],
+            'aac': ['aac'],
+            'wav': ['pcm_s16le', 'pcm_s24le', 'pcm_f32le'],
+            'ogg': ['vorbis', 'libvorbis'],
+            'flac': ['flac'],
+            'm4a': ['aac']
+        }
+        
+        # 如果原始编解码器在目标格式的兼容列表中，则返回True
+        return original_codec in compatible_formats.get(target_format.lower(), []) 

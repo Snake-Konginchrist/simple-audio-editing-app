@@ -57,6 +57,23 @@ def load_audio_file():
     )
     return file_path
 
+def load_video_file():
+    """
+    选择视频文件
+    
+    返回:
+        所选视频文件的路径
+    """
+    filetypes = [
+        ('视频文件', '*.mp4 *.avi *.mov *.mkv *.flv *.wmv *.webm'),
+        ('所有文件', '*.*')
+    ]
+    file_path = filedialog.askopenfilename(
+        title="选择视频文件",
+        filetypes=filetypes
+    )
+    return file_path
+
 def load_multiple_audio_files():
     """
     选择多个音频文件
@@ -123,4 +140,44 @@ def get_audio_duration(file_path):
         return len(audio)
     except Exception as e:
         show_error("错误", f"无法获取音频时长: {str(e)}")
-        return 0 
+        return 0
+
+def get_file_extension(file_path):
+    """
+    获取文件扩展名
+    
+    参数:
+        file_path: 文件路径
+        
+    返回:
+        文件扩展名（不含点号，小写）
+    """
+    return os.path.splitext(file_path)[1].lower().strip('.')
+
+def is_video_file(file_path):
+    """
+    判断是否为视频文件
+    
+    参数:
+        file_path: 文件路径
+        
+    返回:
+        布尔值，表示是否为视频文件
+    """
+    video_extensions = ['mp4', 'avi', 'mov', 'mkv', 'flv', 'wmv', 'webm']
+    ext = get_file_extension(file_path)
+    return ext in video_extensions
+
+def is_audio_file(file_path):
+    """
+    判断是否为音频文件
+    
+    参数:
+        file_path: 文件路径
+        
+    返回:
+        布尔值，表示是否为音频文件
+    """
+    audio_extensions = ['mp3', 'wav', 'aac', 'ogg', 'flac', 'm4a']
+    ext = get_file_extension(file_path)
+    return ext in audio_extensions 

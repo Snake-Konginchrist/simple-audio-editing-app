@@ -12,6 +12,7 @@ from .tabs.main_tab import MainTab
 from .tabs.cut_tab import CutTab
 from .tabs.merge_tab import MergeTab 
 from .tabs.effects_tab import EffectsTab
+from .tabs.extract_tab import ExtractTab
 
 class AudioEditorApp:
     """
@@ -26,8 +27,8 @@ class AudioEditorApp:
         """
         self.root = root
         self.root.title("简易音频编辑器")
-        self.root.geometry("1200x800")
-        self.root.minsize(1000, 700)
+        self.root.geometry("900x650")
+        self.root.minsize(800, 600)
         
         # 存储当前加载的音频文件路径
         self.current_audio_path = None
@@ -58,13 +59,6 @@ class AudioEditorApp:
         """
         创建UI组件
         """
-        # 创建标题
-        title_frame = ttk.Frame(self.main_frame)
-        title_frame.pack(fill=tk.X, pady=10)
-        
-        title_label = ttk.Label(title_frame, text="简易音频编辑器", style="Title.TLabel")
-        title_label.pack()
-        
         # 创建控制栏框架
         control_frame = ttk.Frame(self.main_frame)
         control_frame.pack(fill=tk.X, pady=5)
@@ -77,12 +71,14 @@ class AudioEditorApp:
         self.cut_tab = CutTab(tab_control, self)
         self.merge_tab = MergeTab(tab_control, self)
         self.effects_tab = EffectsTab(tab_control, self)
+        self.extract_tab = ExtractTab(tab_control, self)
         
         # 将选项卡添加到控件
         tab_control.add(self.main_tab.frame, text="基本信息")
         tab_control.add(self.cut_tab.frame, text="剪切/删除")
         tab_control.add(self.merge_tab.frame, text="合并音频")
         tab_control.add(self.effects_tab.frame, text="音频效果")
+        tab_control.add(self.extract_tab.frame, text="视频提取")
         
         tab_control.pack(expand=1, fill=tk.BOTH)
         
