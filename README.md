@@ -1,5 +1,7 @@
 # 简易音频编辑器
 
+[English Documentation](README.en.md) | 中文文档
+
 这是一个简单的桌面应用程序，用于编辑音频文件。应用提供了一个图形用户界面，允许用户执行各种基本的音频编辑操作，如剪切、合并、添加特效等。支持的文件格式包括 MP3、WAV、AAC、OGG、FLAC等。
 
 ## 功能特性
@@ -215,7 +217,8 @@ simple-audio-editing-app/
 ├── app_info.json           # 应用信息与依赖配置
 ├── icon.ico                # 应用图标
 ├── LICENSE                 # 许可证文件
-├── README.md               # 项目说明文档
+├── README.md               # 项目说明文档（中文）
+├── README.en.md            # 项目说明文档（英文）
 ├── src/                    # 源代码目录
 │   ├── __init__.py         # 包初始化文件
 │   ├── core/               # 核心功能模块

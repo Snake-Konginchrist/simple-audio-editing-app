@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import ttk
+from src.utils.language import get_text
 
 class BaseTab:
     """
