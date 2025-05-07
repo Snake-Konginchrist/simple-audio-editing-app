@@ -18,7 +18,13 @@ def load_app_info():
     """从app_info.json文件加载应用信息"""
     try:
         with open('app_info.json', 'r', encoding='utf-8') as f:
-            return json.load(f)
+            app_info = json.load(f)
+            # 确保所有必要字段都存在
+            required_fields = ["name", "version", "author", "description", "main_script", "icon_file"]
+            for field in required_fields:
+                if field not in app_info:
+                    print(f"警告: app_info.json中缺少'{field}'字段")
+            return app_info
     except (FileNotFoundError, json.JSONDecodeError) as e:
         print(f"错误: 无法加载应用信息 - {e}")
         print("使用默认应用信息...")
@@ -29,7 +35,9 @@ def load_app_info():
             "author": "Snake Konginchrist",
             "description": "一个简单的音频编辑桌面应用",
             "main_script": "main.py",
-            "icon_file": "icon.ico"
+            "icon_file": "icon.ico",
+            "dependencies": ["pydub>=0.25.1", "ffmpeg-python>=0.2.0"],
+            "build_dependencies": ["pyinstaller>=5.6.2", "Pillow>=9.0.0"]
         }
 
 # 加载应用信息

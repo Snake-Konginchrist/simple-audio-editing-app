@@ -2,7 +2,22 @@
     "name": "简易音频编辑器",
     "version": "1.0.0",
     "author": "Snake Konginchrist",
+    "author_email": "developer@skstudio.cn",
     "description": "一个简单的音频编辑桌面应用",
     "main_script": "main.py",
-    "icon_file": "icon.ico"
+    "icon_file": "icon.ico",
+    "dependencies": [
+        "pydub>=0.25.1",
+        "ffmpeg-python>=0.2.0"
+    ],
+    "build_dependencies": [
+        "pyinstaller>=5.6.2",
+        "Pillow>=9.0.0"
+    ],
+    "python_version": ">=3.6",
+    "entry_points": {
+        "console_scripts": [
+            "audio-editor=main:main"
+        ]
+    }
 } 

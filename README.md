@@ -27,34 +27,94 @@
 
 ### 先决条件
 
-确保你已安装 Python 3.6+ 和 pip。此外，你还需要安装以下库：
+确保你已安装 Python 3.6+ 和 pip。然后安装项目依赖：
 
 ```bash
-pip install -r requirements.txt
+# 安装基本运行依赖
+python install.py
+
+# 或安装开发依赖（包含构建工具）
+python install.py --dev
 ```
 
 这将安装以下依赖：
 - pydub：用于音频处理
 - ffmpeg-python：用于与 FFmpeg 交互
+- 开发模式还会安装：
+  - pyinstaller：用于打包应用
+  - Pillow：用于图像处理
+
+所有依赖信息都集中在`app_info.json`文件中进行管理。
 
 ### 安装 FFmpeg
 
-FFmpeg 是一个必须的组件，用于处理音频和视频文件。按照以下步骤安装和配置 FFmpeg：
+FFmpeg 是一个必须的组件，用于处理音频和视频文件。以下是各操作系统的安装说明：
+
+#### Windows
 
 1. **下载 FFmpeg**：
-   - 访问 [FFmpeg官方下载页面](https://ffmpeg.org/download.html)。
-   - 根据你的操作系统下载适合的版本。
+   - 访问 [FFmpeg官方下载页面](https://ffmpeg.org/download.html) 或 [FFmpeg Windows 构建](https://www.gyan.dev/ffmpeg/builds/)
+   - 下载"essentials"或"full"版本（推荐下载"git-full"版本）
 
 2. **安装 FFmpeg**：
-   - 解压下载的文件到一个你喜欢的目录，例如 `C:\FFmpeg`。
+   - 解压下载的文件到一个你喜欢的目录，例如 `C:\FFmpeg`
 
 3. **设置环境变量**：
-   - 在 Windows 上，搜索并打开"系统环境变量"编辑器。
-   - 编辑 `Path` 环境变量，添加 FFmpeg 的 bin 目录到该变量中，例如 `C:\FFmpeg\bin`。
-   - 保存更改并重新启动你的开发环境或计算机。
+   - 搜索并打开"系统环境变量"编辑器
+   - 编辑 `Path` 环境变量，添加 FFmpeg 的 bin 目录到该变量中，例如 `C:\FFmpeg\bin`
+   - 保存更改并重新启动命令提示符
 
-4. **验证 FFmpeg 安装**：
-   - 打开命令行，输入 `ffmpeg -version`，如果看到版本信息，则表示安装成功。
+#### macOS
+
+1. **使用 Homebrew 安装（推荐）**：
+   ```bash
+   # 如果未安装Homebrew，先安装它
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+   
+   # 然后安装FFmpeg
+   brew install ffmpeg
+   ```
+
+2. **或使用 MacPorts 安装**：
+   ```bash
+   sudo port install ffmpeg
+   ```
+
+#### Linux
+
+1. **Debian/Ubuntu**：
+   ```bash
+   sudo apt update
+   sudo apt install ffmpeg
+   ```
+
+2. **Fedora**：
+   ```bash
+   sudo dnf install ffmpeg
+   ```
+
+3. **CentOS/RHEL**：
+   ```bash
+   # 启用EPEL和RPM Fusion仓库
+   sudo yum install epel-release
+   sudo yum localinstall --nogpgcheck https://download1.rpmfusion.org/free/el/rpmfusion-free-release-$(rpm -E %rhel).noarch.rpm
+   
+   # 安装FFmpeg
+   sudo yum install ffmpeg
+   ```
+
+4. **Arch Linux**：
+   ```bash
+   sudo pacman -S ffmpeg
+   ```
+
+#### 验证安装
+
+在任何操作系统上，打开终端或命令提示符并输入：
+```bash
+ffmpeg -version
+```
+如果看到版本信息，则表示安装成功。
 
 ### 安装
 
@@ -70,6 +130,29 @@ cd simple-audio-editing-app
 ```bash
 python main.py
 ```
+
+## 构建可执行文件
+
+本项目提供了一个交互式构建脚本，可以将应用打包为可执行文件：
+
+```bash
+python build.py
+```
+
+构建脚本提供以下选项：
+1. **打包模式**：
+   - 单个可执行文件（推荐，体积较大但方便分发）
+   - 文件夹（体积较小但需要保持文件结构完整）
+
+2. **控制台窗口**：
+   - 隐藏控制台（推荐，正常用户使用）
+   - 显示控制台（用于调试，可以查看输出和错误）
+
+3. **FFmpeg打包**：
+   - 不打包FFmpeg（推荐，要求用户自行安装FFmpeg）
+   - 打包FFmpeg（应用体积会显著增大）
+
+构建完成后，可执行文件将生成在`dist`目录中。
 
 ## 使用指南
 
@@ -120,14 +203,44 @@ python main.py
 
 注意：不同音频格式间的转换总会有一定的质量损失，这是由不同编码算法的本质决定的。选择"保留原始音频质量"可以最大程度地减小这种损失。
 
+## 项目结构
+
+本项目使用模块化设计，代码结构清晰：
+
+```
+simple-audio-editing-app/
+├── main.py                 # 程序入口点
+├── build.py                # 应用打包构建脚本
+├── install.py              # 依赖安装脚本
+├── app_info.json           # 应用信息与依赖配置
+├── icon.ico                # 应用图标
+├── LICENSE                 # 许可证文件
+├── README.md               # 项目说明文档
+├── src/                    # 源代码目录
+│   ├── __init__.py         # 包初始化文件
+│   ├── core/               # 核心功能模块
+│   │   ├── audio_processor.py  # 音频处理类
+│   │   ├── audio_merger.py     # 音频合并功能
+│   │   └── ...
+│   ├── ui/                 # 用户界面模块
+│   │   ├── main_window.py      # 主窗口类
+│   │   ├── audio_player.py     # 音频播放器组件
+│   │   └── ...
+│   └── utils/              # 工具函数模块
+│       ├── time_formatter.py   # 时间格式转换工具
+│       ├── file_utils.py       # 文件操作工具
+│       └── ...
+├── build/                  # 构建临时文件（自动生成）
+└── dist/                   # 打包后的可执行文件（自动生成）
+```
+
 ## 技术实现
 
-本项目使用 Python 的 Tkinter 库构建 GUI，使用 pydub 进行音频处理，使用 FFmpeg 进行视频处理。代码结构清晰，采用模块化设计：
+本项目使用 Python 的 Tkinter 库构建 GUI，使用 pydub 进行音频处理，使用 FFmpeg 进行视频处理。代码结构采用模块化设计，将功能分为三个主要模块：
 
-- **main.py**：程序入口
-- **src/ui**：用户界面模块
-- **src/core**：音频处理功能模块
-- **src/utils**：工具函数模块
+- **core**：负责音频处理的核心功能，如剪切、合并、添加效果等
+- **ui**：负责用户界面的实现，包括主窗口和各个功能模块的界面
+- **utils**：提供各种辅助功能，如时间格式转换、文件操作等
 
 ## 贡献
 
